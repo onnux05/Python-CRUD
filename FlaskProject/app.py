@@ -3,14 +3,14 @@ import psycopg2
 import psycopg2.extras
  
 app = Flask(__name__)
-app.secret_key = "cairocoders-ednalan"
+app.secret_key = "b+k\x88\xf0\xe66^\xa5'\xff\xd0\xcf9@O\x00A$\xf9m\xdf\xeb\xd9\x84"
  
-DB_HOST = "localhost"
-DB_NAME = "sampledb"
-DB_USER = "postgres"
-DB_PASS = "root"
+HOST = "localhost"
+DBNAME = "sampledb"
+USERDB = "postgres"
+DBPASS = "root"
 port_id = 5432
-conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+conn = psycopg2.connect(dbname=DBNAME, user=USERDB, password=DBPASS, host=HOST)
  
 @app.route('/')
 def Index():
@@ -25,9 +25,10 @@ def add_student():
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if request.method == 'POST':
         fname = request.form['fname']
-        lname = request.form['lname']
-        email = request.form['email']
-        cur.execute("INSERT INTO students (fname, lname, email) VALUES (%s,%s,%s)", (fname, lname, email))
+        rollno = request.form['rollno']
+        dept = request.form['dept']
+        place = request.form['place']
+        cur.execute("INSERT INTO students (fname,rollno, dept,place) VALUES (%s,%s,%s,%s)", (fname, rollno, dept, place))
         conn.commit()
         flash('Student Added successfully')
         return redirect(url_for('Index'))
@@ -35,8 +36,7 @@ def add_student():
 @app.route('/edit/<id>', methods = ['POST', 'GET'])
 def get_employee(id):
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-   
-    cur.execute('SELECT * FROM students WHERE id = %s', (id))
+    cur.execute("SELECT * FROM students WHERE id = %s", (id))
     data = cur.fetchall()
     cur.close()
     print(data[0])
@@ -46,17 +46,19 @@ def get_employee(id):
 def update_student(id):
     if request.method == 'POST':
         fname = request.form['fname']
-        lname = request.form['lname']
-        email = request.form['email']
+        rollno = request.form['rollno']
+        dept = request.form['dept']
+        place = request.form['place']
          
         cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cur.execute("""
             UPDATE students
             SET fname = %s,
-                lname = %s,
-                email = %s
+                rollno = %s,
+                dept = %s,
+                place = %s
             WHERE id = %s
-        """, (fname, lname, email, id))
+        """, (fname, rollno, dept, place, id))
         flash('Student Updated Successfully')
         conn.commit()
         return redirect(url_for('Index'))
